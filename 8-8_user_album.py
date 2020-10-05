@@ -1,12 +1,15 @@
 # TC 2020/10/4/23:16
 
 def make_album(name,album,num=''):
+    '''创建专辑'''
     message = {'name':name,'album':album}
     if num == '':
         return message
     else:
         message['total'] = num
         return message
+
+    
 while True:
     name = input('输入歌手名称：(退出输入q)')
     if name == 'q':
