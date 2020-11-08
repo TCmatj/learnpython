@@ -1,5 +1,6 @@
 import sys
 import pygame
+import json
 from bullet import Bullet
 from alien import Alien
 from time import sleep
@@ -36,6 +37,8 @@ def check_events(ai_settings,screen,stats,play_button,ship,aliens,bullets):
     """响应键盘和鼠标事件"""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            with open('Pygame\high_score.json','w') as f:
+               json.dump(stats.high_score,f)
             pygame.quit()
             sys.exit()
 
@@ -87,20 +90,25 @@ def update_screen(ai_settings,screen,stats,sb,ship,aliens,bullets,play_button):
     #让最近绘制的屏幕可见
     pygame.display.flip()
 
-def update_bullets(ai_settings,screen,ship,aliens,bullets):
+def update_bullets(ai_settings,screen,stats,sb,ship,aliens,bullets):
     """更新子弹的位置，并删除已消失的子弹"""
     bullets.update()
     #删除消失的子弹
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
-    check_bullet_alien_collisions(ai_settings,screen,ship,aliens,bullets)
+    check_bullet_alien_collisions(ai_settings,screen,stats,sb,ship,aliens,bullets)
     
-def check_bullet_alien_collisions(ai_settings,screen,ship,aliens,bullets):
+def check_bullet_alien_collisions(ai_settings,screen,stats,sb,ship,aliens,bullets):
     """响应子弹和外星人的碰撞"""
     # 如果有，删除相应的子弹和外星人
     collisions = pygame.sprite.groupcollide(bullets,aliens,True,True)
 
+    if collisions:
+        for aliens in collisions.values():
+            stats.score += ai_settings.alien_points * len(aliens)
+            sb.prep_score()
+        check_high_score(stats,sb)
     if len(aliens) == 0:
         #删除现有的子弹,加速游戏节奏，并新建一群外星人
         bullets.empty()
@@ -200,3 +208,9 @@ def update_aliens(ai_settings,stats,screen,ship,aliens,bullets):
     if pygame.sprite.spritecollideany(ship,aliens):
         ship_hit(ai_settings,stats,screen,ship,aliens,bullets)
     check_aliens_bottom(ai_settings,stats,screen,ship,aliens,bullets)
+
+def check_high_score(stats,sb):
+    """检查是否诞生了新的最高得分"""
+    if stats.score > stats.high_score:
+        stats.high_score = stats.score
+        sb.prep_high_score()

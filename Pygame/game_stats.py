@@ -1,3 +1,5 @@
+import json
+
 class GameStats():
     """跟踪游戏的统计信息"""
 
@@ -6,6 +8,10 @@ class GameStats():
         self.ai_settings =ai_settings
         self.reset_stats()
         self.game_active = False
+        # 在任何情况下都不应重置最高得分
+        with open("Pygame\high_score.json",'r') as f:
+            self.high_score = json.load(f)
+
     def reset_stats(self):
         """初始化在游戏期间可能变化的统计信息"""
         self.ships_left = self.ai_settings.ship_limit
