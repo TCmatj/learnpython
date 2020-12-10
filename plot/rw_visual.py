@@ -5,6 +5,8 @@ from random_walk import RandomWalk
 while True:
     rw = RandomWalk()
     rw.fill_walk()
+
+    plt.figure(dpi=80,figsize=(10,6))
     point_numbers = list(range(rw.num_points))
     plt.scatter(rw.x_values,rw.y_values,c=point_numbers,
                 cmap='pink',edgecolor='none',s=1)
